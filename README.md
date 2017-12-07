@@ -1,4 +1,5 @@
 # linux-lab
+# โปรแกรมโชว์รูปภาพ Movies หรือ Cartoons
 
 > ผู้พัฒนาโครงการ Phuthanet Silathip รหัสนักศึกษา 59110440323
 
