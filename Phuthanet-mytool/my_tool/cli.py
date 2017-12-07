@@ -27,9 +27,6 @@ def getURL(input):
 					html = getHTML('http://'+cite.text)
 					break
 		return getJSON(html)	
-	except Exception as e:
-		return 'Invalid input or Network Error!'
-		
 
 
 @click.command()
