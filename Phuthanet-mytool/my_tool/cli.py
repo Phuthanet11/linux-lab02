@@ -1,40 +1,25 @@
-import click,json,requests
-from bs4 import BeautifulSoup
+import click
+import requests
+
 from PIL import Image
 from StringIO import StringIO
-
-
-
-def getJSON(html):
-	data = {}
-	data['poster'] = html.find(attrs={'class':'poster'}).find('img')['src']
-	json_data = json.dumps(data)
-	return json_data
-	
-def getHTML(url):
-	response = requests.get(url)
-	return BeautifulSoup(response.content,'html.parser')	
-	
-def getURL(input):
-	try:
-		if input[0] == 't' and input[1] == 't':
-			html = getHTML('http://www.imdb.com/title/'+input+'/')
-			
-		else:
-			html = getHTML('https://www.google.co.in/search?q='+input)
-			for cite in html.findAll('cite'):
-				if 'imdb.com/title/tt' in cite.text:
-					html = getHTML('http://'+cite.text)
-					break
-		return getJSON(html)	
-
+from bs4 import BeautifulSoup
 
 @click.command()
-@click.option('--as-cowboy', '-c', is_flag=True, help='Greet as a cowboy.')
-@click.argument('name', default='world', required=False)
-def main(name, as_cowboy):
-    r = json.loads(getURL(name))
-    print(type(r))
-    req = requests.get(r['poster'])
-    img = Image.open(StringIO(req.content))
-    img.show()
+@click.argument('src', nargs=-1)   
+@click.argument('dst', nargs=1)
+def main(src, dst):
+	search=""	
+	for fn in src:
+        	search+='%s' % (fn)+" "
+	search+='%s'%(dst)
+	url_search="https://www.google.co.in/search?ei=8TkhWvTLKsH-vAS--4SYDg&q="+search+"  http://www.imdb.com".replace(" ","+")
+	html=requests.get(url_search)
+	b=BeautifulSoup(html.content,'html.parser')
+	hint="https://"+b.find_all('div',{'class':'s'})[0].div.cite.text
+	src=requests.get(hint)
+	b=BeautifulSoup(src.content,'html.parser')
+	photo=b.find_all('div',{'class':'poster'})[0].img['src']
+	req=requests.get(photo)
+	img=Image.open(StringIO(req.content))  
+	img.show()
